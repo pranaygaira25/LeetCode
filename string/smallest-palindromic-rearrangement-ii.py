@@ -1,49 +1,54 @@
 from collections import Counter
+from math import comb
 
 class Solution:
     def smallestPalindrome(self, s: str, k: int) -> str:
         cnt = Counter(s)
 
-        half = []
         mid = ""
+        half = {}
+        m = 0
+
         for ch in sorted(cnt):
-            if cnt[ch] % 2:
+            if cnt[ch] & 1:
                 mid = ch
-            half.extend([ch] * (cnt[ch] // 2))
+            half[ch] = cnt[ch] // 2
+            m += half[ch]
 
-        n = len(half)
+        LIMIT = k
 
-        fact = [1] * (n + 1)
-        for i in range(1, n + 1):
-            fact[i] = fact[i - 1] * i
-
-        freq = Counter(half)
-
-        def ways():
-            total = sum(freq.values())
-            res = fact[total]
-            for v in freq.values():
-                res //= fact[v]
+        def count_perm(freq, total):
+            res = 1
+            rem = total
+            for ch in sorted(freq):
+                c = freq[ch]
+                if c:
+                    res *= comb(rem, c)
+                    if res > LIMIT:
+                        return LIMIT + 1
+                    rem -= c
             return res
 
-        # Check if the k-th palindrome exists
-        if k > ways():
+        if count_perm(half, m) < k:
             return ""
 
         left = []
 
-        for _ in range(n):
-            for ch in sorted(freq):
-                if freq[ch] == 0:
+        while m:
+            for ch in sorted(half):
+                if half[ch] == 0:
                     continue
-                freq[ch] -= 1
-                w = ways()
-                if k > w:
-                    k -= w
-                    freq[ch] += 1
-                else:
+
+                half[ch] -= 1
+                ways = count_perm(half, m - 1)
+
+                if ways >= k:
                     left.append(ch)
+                    m -= 1
                     break
+                else:
+                    k -= ways
+                    half[ch] += 1
 
         left = "".join(left)
         return left + mid + left[::-1]
