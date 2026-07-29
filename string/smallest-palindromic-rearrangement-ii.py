@@ -12,18 +12,24 @@ class Solution:
             half.extend([ch] * (cnt[ch] // 2))
 
         n = len(half)
+
         fact = [1] * (n + 1)
         for i in range(1, n + 1):
             fact[i] = fact[i - 1] * i
 
-        def ways(freq):
+        freq = Counter(half)
+
+        def ways():
             total = sum(freq.values())
             res = fact[total]
             for v in freq.values():
                 res //= fact[v]
             return res
 
-        freq = Counter(half)
+        # Check if the k-th palindrome exists
+        if k > ways():
+            return ""
+
         left = []
 
         for _ in range(n):
@@ -31,7 +37,7 @@ class Solution:
                 if freq[ch] == 0:
                     continue
                 freq[ch] -= 1
-                w = ways(freq)
+                w = ways()
                 if k > w:
                     k -= w
                     freq[ch] += 1
