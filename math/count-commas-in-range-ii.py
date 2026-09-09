@@ -1,15 +1,10 @@
-class Solution {
-public:
-    long long countCommas(long long n) {
-        long long ans = 0;
+class Solution:
+    def countCommas(self, n: int) -> int:
+        ans = 0
+        power = 1000
 
-        for (long long x = 1000; x <= n; x *= 1000) {
-            ans += n - x + 1;
+        while power <= n:
+            ans += n - power + 1
+            power *= 1000
 
-            // Prevent overflow if constraints are extended
-            if (x > n / 1000) break;
-        }
-
-        return ans;
-    }
-};
+        return ans
